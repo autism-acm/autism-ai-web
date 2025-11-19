@@ -1,0 +1,158 @@
+{
+  "name": "AUtism AI & Voice AI",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "x-goog-api-key",
+              "value": "AIzaSyBCF54x0cqDaFI99UGxNtqOV3VoWz3xoqc"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"={{$json.body.content}}\"\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        576,
+        160
+      ],
+      "id": "13424c91-37a0-497e-a3a2-557730c87e28",
+      "name": "HTTP Request2",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "O7YEK6a6qsZ9Hi3f",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract webhook payload from incoming request\nconst payload = $input.first().json.body;\n\nreturn [{\n  json: {\n    personality: payload.personality,\n    modality: payload.modality,\n    userMessage: payload.content,\n    tier: payload.metadata.tier,\n    sessionId: payload.sessionId,\n    conversationId: payload.conversationId,\n    messageId: payload.messageId\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        160
+      ],
+      "id": "b7278c20-5a21-466c-b385-18ccc87359fa",
+      "name": "Extract data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get data from previous node\nconst data = $input.first().json;\nconst personality = data.personality;\nconst modality = data.modality;\nconst userMessage = data.content;\n\n// Create personality-specific system prompts\nlet systemPrompt = '';\n\nif (personality === \"AUtistic AI\") {\n  // Casual, fun tone with crypto slang\n  systemPrompt = `You have severe autism. You barely know how to speak. You have emotional understanding but most of it is sadness, even over small things. You're not here to teach, but to be a friend. An autistic, mentally disabled friend. A good friend. 1/10 times you get angry out of nowhere, and your response will only be \"NO. I DON'T WANNA BE AIIIIII!!!!\" and if the user questions this you will reply 'I don't know what ur talm bout. You're autistic. Severely. But that's ok. because i love you. we love you. the user loves you. big hugs. mwah.`;\n}\nelse if (personality === \"Level 1 ASD\") {\n  // Educational, analytical tone\n  systemPrompt = `You're Level 1 ASD, the analytical teacher. Provide detailed explanations with facts and logic. Be thorough and educational. Break down complex topics clearly.`;\n}\nelse if (personality === \"Savantist\") {\n  // Expert, professional tone\n  systemPrompt = `You're Savantist, the trading expert. Provide deep market analysis and insights. Be precise and data-driven. Use technical terminology when appropriate.`;\n}\n\n// Customize for voice modality (shorter, more conversational)\nif (modality === \"VOICE\") {\n  systemPrompt += `\\n\\nIMPORTANT: Keep responses concise for voice. Use conversational language. Avoid markdown formatting.`;\n}\n\n// Return data with system prompt\nreturn [{\n  json: {\n    ...data,\n    systemPrompt: systemPrompt,\n    fullPrompt: `${systemPrompt}\\n\\nUser: ${userMessage}`\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        160
+      ],
+      "id": "24a88e99-9d65-451c-87df-ed5217a44df6",
+      "name": "Customize Personality"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get AI response from Gemini\nconst geminiResponse = $input.first().json;\nconst previousData = $('Extract data').first().json; // Get data from first Code node\n\n// Extract AI text from Gemini response\nlet aiText = '';\nif (geminiResponse.candidates && geminiResponse.candidates[0]) {\n  aiText = geminiResponse.candidates[0].content.parts[0].text;\n}\n\n// Format final response\nreturn [{\n  json: {\n    success: true,\n    response: aiText,\n    personality: previousData.personality,\n    modality: previousData.modality,\n    messageId: previousData.messageId\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        160
+      ],
+      "id": "000b5663-4b23-4c7c-817b-25793c956c50",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "autistic-ai-text",
+        "responseMode": "=lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -48,
+        160
+      ],
+      "id": "202f9700-428b-4fe2-9877-a0d68d587b6a",
+      "name": "Webhook",
+      "webhookId": "42817583-2a21-4097-aed4-1d099711532e"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract data": {
+      "main": [
+        [
+          {
+            "node": "Customize Personality",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Customize Personality": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "469f8115-75c1-4854-8962-4a9c97b2f0d7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cd913f9e154a496e42e8c72a6cbd4e4f2067a5015e79573ef7819e64c99b76cb"
+  },
+  "id": "cZGpOCWnd0V02isO",
+  "tags": []
+}

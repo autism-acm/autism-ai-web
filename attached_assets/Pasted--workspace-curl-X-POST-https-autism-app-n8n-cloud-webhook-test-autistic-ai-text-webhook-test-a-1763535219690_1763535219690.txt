@@ -1,0 +1,18 @@
+~/workspace$ curl -X POST https://autism.app.n8n.cloud/webhook-test/autistic-ai-text \webhook-test/autistic-ai-text \webhook-test/autistic-ai-text \
+  -H "Content-Type: application/json" \
+  -d '{
+  "personality": "AUtistic AI",
+  "modality": "TEXT",
+  "sessionId": "test-session-12333",
+  "conversationId": "test-conv-46",
+  "messageId": "test-msg-79",
+  "content": "Which Gemini version are you, what date is it, and what happened yesterday in crypto",
+  "metadata": {
+    "tier": "Free Trial",
+    "tokenBalance": 0,
+    "walletAddress": null,
+    "timestamp": 1763532800000
+  }
+}'
+{"success":true,"response":"This looks like a **template or expression syntax** used to access a specific value within a JSON object.\n\nHere's a breakdown:\n\n*   `{{...}}`: This is typically an **interpolation or templating syntax**. It tells a system (like a template engine, a workflow automation tool, or an API processing tool) to evaluate the expression inside the double curly braces and insert its resulting value at that point.\n*   `$json`: This is likely a **variable name** representing an entire JSON object that is available in the current context. The `$` prefix is often used for system variables or dynamic data.\n*   `.content`: This is a **property access** or **dot notation**. It means you want to access the property named `content` *within* the `$json` object.\n\n**In essence, `{{$json.content}}` means:**\n\n\"Take the JSON object represented by the variable `$json`, find its `content` property, and insert the value of that `content` property here.\"\n\n**Example:**\n\nLet's say your `$json` variable holds the following JSON data:\n\n```json\n{\n  \"id\": \"123\",\n  \"title\": \"My Awesome Document\",\n  \"content\": \"This is the actual content of the document, a string of text.\",\n  \"metadata\": {\n    \"author\": \"John Doe\",\n    \"date\": \"2023-10-27\"\n  }\n}\n```\n\nIf you use `{{$json.content}}` in a template or expression, it would resolve to:\n\n```\nThis is the actual content of the document, a string of text.\n```\n\n**Common Contexts:**\n\nYou'll often see this kind of syntax in:\n*   **Workflow automation platforms** (e.g., Zapier, Make, n8n) to refer to dynamic data from previous steps.\n*   **API response processing** where you want to extract a specific field.\n*   **Template engines** (like Handlebars, Jinja, Liquid, though the exact variable names might differ) to display data.\n*   **Serverless functions** or **scripting environments** where a payload is passed as `$json`.","personality":"AUtistic AI","modality":"TEXT","messageId":"test-msg-79"}curl: (6) Could not resolve host: webhook-test
+curl: (6) Could not resolve host: webhook-test
